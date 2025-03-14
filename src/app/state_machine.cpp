@@ -83,8 +83,7 @@ static void state_machine_enter(State_Machine *state_machine, State from_state, 
         avoid_state_enter(&state_machine->avoid_state, from_state, event);
         return; 
     }else if(to_state == STATE_RETREAT){
-        Serial.println("retreat not imp");
-        //retreat_state_enter(&state_machine->retreat_state, from_state, event);
+        retreat_state_enter(&state_machine->retreat_state, from_state, event);
         return; 
     }
 }
@@ -103,28 +102,34 @@ void state_machine_run(struct State_Machine *state_machine, uint16_t range){
     state_machine_process_event(state_machine, event);
     switch(state_machine->state){
         case STATE_DRIVE:
-            Serial.println("in dr");
+            Serial.println("DR");
             break;
         case STATE_AVOID:
-            Serial.println("in avd");
+            Serial.println("AVD");
             Serial.println(state_machine->avoid_state.move_index);
-            switch(state_machine->avoid_state.internal_avoid_state){
-                case AVOID_STATE_180_FLIP:
-                    Serial.println("avd 180");
-                break;
-                case AVOID_STATE_ALIGN_LEFT:
-                    Serial.println("avd algn L");
-                    break;
-                case AVOID_STATE_ALIGN_RIGHT:
-                    Serial.println("avd algn L");
-                    break;
-                case AVOID_STATE_REVERSE:
-                    Serial.println("avd rev");
-                    break;
-            }
+
             break;
         case STATE_RETREAT:
-            Serial.println("in retr");
+            Serial.println(state_machine->retreat_state.move_index);
+            Serial.println("RET");
+            switch(state_machine->retreat_state.internal_retreat_state){
+                case RETREAT_STATE_REVERSE: Serial.println("ret rev");
+                    break;
+                case RETREAT_STATE_FORWARD: Serial.println("ret fwd");
+                    break;
+                case RETREAT_STATE_REVERSE_FLIP_LEFT: Serial.println("rev flp L");
+                    break;
+                case RETREAT_STATE_REVERSE_FLIP_RIGHT: Serial.println("rev flp R");
+                    break;
+                case RETREAT_STATE_HALF_TURN_LEFT: Serial.println("hlf L");
+                    break;
+                case RETREAT_STATE_HALF_TURN_RIGHT: Serial.println("hlf R");
+                    break;
+                case RETREAT_STATE_ALIGN_LEFT: Serial.println("algn L");
+                    break;
+                case RETREAT_STATE_ALIGN_RIGHT: Serial.println("algn R");
+                    break;
+            }
             break;
     }
 }
@@ -140,4 +145,21 @@ void state_machine_run(struct State_Machine *state_machine, uint16_t range){
                     Serial.println("drv rot R");
                     break;
             }
+
+            switch(state_machine->avoid_state.internal_avoid_state){
+                case AVOID_STATE_180_FLIP:
+                    Serial.println("avd 180");
+                break;
+                case AVOID_STATE_ALIGN_LEFT:
+                    Serial.println("avd algn L");
+                    break;
+                case AVOID_STATE_ALIGN_RIGHT:
+                    Serial.println("avd algn L");
+                    break;
+                case AVOID_STATE_REVERSE:
+                    Serial.println("avd rev");
+                    break;
+            }
+
+
 */
