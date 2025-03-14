@@ -112,25 +112,6 @@ void state_machine_run(struct State_Machine *state_machine, uint16_t range){
         case STATE_RETREAT:
             Serial.println(state_machine->retreat_state.move_index);
             Serial.println("RET");
-            switch(state_machine->retreat_state.internal_retreat_state){
-                case RETREAT_STATE_REVERSE: Serial.println("ret rev");
-                    break;
-                case RETREAT_STATE_FORWARD: Serial.println("ret fwd");
-                    break;
-                case RETREAT_STATE_REVERSE_FLIP_LEFT: Serial.println("rev flp L");
-                    break;
-                case RETREAT_STATE_REVERSE_FLIP_RIGHT: Serial.println("rev flp R");
-                    break;
-                case RETREAT_STATE_HALF_TURN_LEFT: Serial.println("hlf L");
-                    break;
-                case RETREAT_STATE_HALF_TURN_RIGHT: Serial.println("hlf R");
-                    break;
-                case RETREAT_STATE_ALIGN_LEFT: Serial.println("algn L");
-                    break;
-                case RETREAT_STATE_ALIGN_RIGHT: Serial.println("algn R");
-                    break;
-            }
-            break;
     }
 }
 /*
@@ -161,5 +142,23 @@ void state_machine_run(struct State_Machine *state_machine, uint16_t range){
                     break;
             }
 
-
+            switch(state_machine->retreat_state.internal_retreat_state){
+                case RETREAT_STATE_REVERSE: Serial.println("ret rev");
+                    break;
+                case RETREAT_STATE_FORWARD: Serial.println("ret fwd");
+                    break;
+                case RETREAT_STATE_REVERSE_FLIP_LEFT: Serial.println("rev flp L");
+                    break;
+                case RETREAT_STATE_REVERSE_FLIP_RIGHT: Serial.println("rev flp R");
+                    break;
+                case RETREAT_STATE_HALF_TURN_LEFT: Serial.println("hlf L");
+                    break;
+                case RETREAT_STATE_HALF_TURN_RIGHT: Serial.println("hlf R");
+                    break;
+                case RETREAT_STATE_ALIGN_LEFT: Serial.println("algn L");
+                    break;
+                case RETREAT_STATE_ALIGN_RIGHT: Serial.println("algn R");
+                    break;
+            }
+            break;
 */

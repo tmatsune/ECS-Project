@@ -19,6 +19,7 @@ void test_function(){}
 void init_app(){
     init_timer();
     i2c_init();
+    pwm_init();
     lines_init();
     state_machine_init(&state_machine, &timer);
 }
