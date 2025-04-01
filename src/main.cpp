@@ -7,22 +7,24 @@
 #include <app/obj.h>
 #include <app/line.h>
 #include <app/state_machine.h>
+#define TRIG_PIN 13
+#define ECHO_PIN 12
 
 uint16_t range = 0;
 struct Timer timer = {.time = 0, .timeout = 0};
 struct State_Machine state_machine;
+bool run_system = false;
 
-// ------- TEST ------ //
-void test_function(){}
 // ------------------- //
-
 void init_app(){
     init_timer();
-    i2c_init();
+    //i2c_init();
     pwm_init();
     lines_init();
     state_machine_init(&state_machine, &timer);
+    pinMode(2, INPUT);
 }
+
 
 void setup() {
   mc_init();
@@ -33,14 +35,30 @@ void setup() {
 void loop() {
     uint32_t time1 = get_time();
     timer_tick(&timer, time1);
-    
+
+    range = 900;
+    run_system = digitalRead(2);
+    if(run_system == HIGH){
+        state_machine_run(&state_machine, range);
+    }else{
+        drive_stop();
+    }
+
+}
+
+/*
     bool can_read_1 = read_range(LOC1_ADDR, &range);
+    Serial.println(range);
     if(can_read_1){
        state_machine_run(&state_machine, range);
     }else{
-        while(1) Serial.println("VL5 ERR");
+        while(1) {
+            Serial.println("VL5 ERR");
+            ERROR();
+        }
     }
-}
+
+*/
 
 /*
 PRINT LINE

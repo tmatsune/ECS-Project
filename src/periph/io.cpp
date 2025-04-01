@@ -78,7 +78,7 @@ void register_isr(io_pins pin, isr_function isr){
     default:
         break;
     }
-}
+} 
 void unregiser_isr(io_pins pin){
     switch (pin)
     {

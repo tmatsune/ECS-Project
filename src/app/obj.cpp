@@ -8,9 +8,9 @@ Obj get_object(uint16_t loc){
 }
 
 Obj_Range get_object_range(uint16_t range){
-    if(range < 200) return OBJ_RANGE_CLOSE;
-    else if (range < 400) return OBJ_RANGE_MID;
-    else if (range < 600) return OBJ_RANGE_FAR;
+    if(range < 70) return OBJ_RANGE_CLOSE;
+    else if (range < 100) return OBJ_RANGE_MID;
+    else if (range < 150) return OBJ_RANGE_FAR;
     return OBJ_RANGE_NONE;
 }
 

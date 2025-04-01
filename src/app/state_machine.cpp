@@ -48,8 +48,9 @@ static bool has_internal_event(struct State_Machine *state_machine) {
 }
 
 static Event take_internal_event(struct State_Machine *state_machine){
-    if (!has_internal_event(state_machine))
-        while(1) Serial.println("no inter");
+    if (!has_internal_event(state_machine)){
+        drive_stop();
+    }
     Event event = state_machine->internal_event;
     state_machine->internal_event = EVENT_NONE;
     return event; 
@@ -107,7 +108,6 @@ void state_machine_run(struct State_Machine *state_machine, uint16_t range){
         case STATE_AVOID:
             Serial.println("AVD");
             Serial.println(state_machine->avoid_state.move_index);
-
             break;
         case STATE_RETREAT:
             Serial.println(state_machine->retreat_state.move_index);

@@ -40,7 +40,7 @@ void drive_state_enter(struct Drive_State *drive_state, State from_state, Event 
                     drive_state_run(drive_state);
                 break;
                 default:
-                    while(1){Serial.println("1");}
+                    drive_stop();
                 break;
             }
         break;
@@ -54,7 +54,7 @@ void drive_state_enter(struct Drive_State *drive_state, State from_state, Event 
                     drive_state_run(drive_state);
                 break;
                 default:
-                    while(1){Serial.println("2");}
+                    drive_stop();
                 break;
             }
         break;
@@ -65,12 +65,12 @@ void drive_state_enter(struct Drive_State *drive_state, State from_state, Event 
                     drive_state_run(drive_state);
                     break;
                 default:
-                    while(1){Serial.println("3");}
+                    drive_stop();
                 break;
             }
         break;
         default:
-            while(1){Serial.println("4");}
+            drive_stop();
         break;
     }
 }
@@ -108,38 +108,39 @@ struct Drive_Move {
 // ----------------------------------    AVOID STATE    ------------------------------ //
 static const Drive_Move avoid_states[] = {
     [AVOID_STATE_REVERSE] = {
-        .moves = {{.direction = DRIVE_DIR_REVERSE, .speed = DRIVE_SPEED_MAX, .duration = 100}},
+        .moves = {{.direction = DRIVE_DIR_REVERSE, .speed = DRIVE_SPEED_MAX, .duration = 10}},
         .move_count = 1,
     },
     [AVOID_STATE_180_FLIP] = {
         .moves = {
-            {.direction = DRIVE_DIR_REVERSE, .speed = DRIVE_SPEED_MAX, .duration = 120},
-            {.direction = DRIVE_DIR_ROTATE_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 60},
+            {.direction = DRIVE_DIR_REVERSE, .speed = DRIVE_SPEED_MAX, .duration = 5},
+            {.direction = DRIVE_DIR_ROTATE_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 25},
         },
         .move_count = 2,
     },
     [AVOID_STATE_ALIGN_LEFT] = {
-        .moves = {
-            {.direction = DRIVE_DIR_REVERSE, .speed = DRIVE_SPEED_MAX, .duration = 40},
-            {.direction = DRIVE_DIR_SHARP_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 80},
-            {.direction = DRIVE_DIR_MID_RIGHT, .speed = DRIVE_SPEED_MAX, .duration = 120},
-            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 150},
+        .moves = { 
+            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 10},
+            {.direction = DRIVE_DIR_SHARP_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 30},
+            {.direction = DRIVE_DIR_MID_RIGHT, .speed = DRIVE_SPEED_MAX, .duration = 40},
+            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 10},
         },
         .move_count = 4,
     },
     [AVOID_STATE_ALIGN_RIGHT] = {
         .moves = {
-            {.direction = DRIVE_DIR_REVERSE, .speed = DRIVE_SPEED_MAX, .duration = 40},
-            {.direction = DRIVE_DIR_SHARP_RIGHT, .speed = DRIVE_SPEED_MAX, .duration = 80},
-            {.direction = DRIVE_DIR_MID_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 120},
-            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 150},
+            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 10},
+            {.direction = DRIVE_DIR_SHARP_RIGHT, .speed = DRIVE_SPEED_MAX, .duration = 30},
+            {.direction = DRIVE_DIR_MID_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 40},
+            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 10},
         },
         .move_count = 4,
     },
 };
 
 static Internal_Avoid_State getRandomAvoidState() {
-    return (rand() % 2 == 0) ? AVOID_STATE_ALIGN_LEFT : AVOID_STATE_ALIGN_RIGHT;
+    return AVOID_STATE_180_FLIP;
+    //return (rand() % 2 == 0) ? AVOID_STATE_ALIGN_LEFT : AVOID_STATE_ALIGN_RIGHT;
 }
 
 static Move current_avoid_move(const struct Avoid_State *avoid_state){
@@ -148,7 +149,7 @@ static Move current_avoid_move(const struct Avoid_State *avoid_state){
 
 static void start_avoid_move(const struct Avoid_State *avoid_state){
     if(avoid_state->move_index > avoid_states[avoid_state->internal_avoid_state].move_count){
-        while(1) Serial.println("5");
+        drive_stop();
     }
     struct Move move = current_avoid_move(avoid_state);
     timer_set_timeout(avoid_state->common_data->timer, move.duration);
@@ -166,7 +167,7 @@ static Internal_Avoid_State next_avoid_state(struct Avoid_State *avoid_state){
         case OBJ_RANGE_NONE:
             return AVOID_STATE_REVERSE;
     }
-    while(1) Serial.println("6");
+    drive_stop();
     return AVOID_STATE_REVERSE;
 }
 
@@ -183,7 +184,7 @@ void avoid_state_enter(Avoid_State *avoid_state, State from_state, Event event) 
                     break;
                 default:
                     // TODO: Handle error - FROM DRIVE, ONLY OBJ EVENT SHOULD CAUSE AVOID ENTER
-                    while(1) Serial.println("7");
+                    drive_stop();
                 break;
             }
             break;
@@ -214,13 +215,13 @@ void avoid_state_enter(Avoid_State *avoid_state, State from_state, Event event) 
                     break;
 
                 default:
-                    while(1) Serial.println("8");
+                    drive_stop();
                     break;
             }
             break;
 
         case STATE_RETREAT:
-            while(1) Serial.println("9");
+            drive_stop();
             break;
     }
 }
@@ -241,22 +242,22 @@ static const Drive_Move retreat_states[] = {
     [RETREAT_STATE_REVERSE] = {
         .moves = {{.direction = DRIVE_DIR_REVERSE, .speed = DRIVE_SPEED_MAX, .duration = 100}},
         .move_count = 1,
-    },
+    },  
     [RETREAT_STATE_FORWARD] = {
         .moves = {{.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 100}},
         .move_count = 1,
     },
     [RETREAT_STATE_REVERSE_FLIP_LEFT] = {
         .moves = {
-            {.direction = DRIVE_DIR_REVERSE, .speed = DRIVE_SPEED_MAX, .duration = 120},
-            {.direction = DRIVE_DIR_ROTATE_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 100},
+            {.direction = DRIVE_DIR_REVERSE, .speed = DRIVE_SPEED_MAX, .duration = 10},
+            {.direction = DRIVE_DIR_ROTATE_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 30},
         },
         .move_count = 2,
     },
     [RETREAT_STATE_REVERSE_FLIP_RIGHT] = {
         .moves = {
-            {.direction = DRIVE_DIR_REVERSE, .speed = DRIVE_SPEED_MAX, .duration = 120},
-            {.direction = DRIVE_DIR_ROTATE_RIGHT, .speed = DRIVE_SPEED_MAX, .duration = 100},
+            {.direction = DRIVE_DIR_REVERSE, .speed = DRIVE_SPEED_MAX, .duration = 10},
+            {.direction = DRIVE_DIR_ROTATE_RIGHT, .speed = DRIVE_SPEED_MAX, .duration = 30},
         },
         .move_count = 2,
     },
@@ -276,19 +277,19 @@ static const Drive_Move retreat_states[] = {
     },
     [RETREAT_STATE_ALIGN_LEFT] = {
         .moves = {
-            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 20},
-            {.direction = DRIVE_DIR_SHARP_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 80},
-            {.direction = DRIVE_DIR_MID_RIGHT, .speed = DRIVE_SPEED_MAX, .duration = 140},
-            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 80},
+            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 10},
+            {.direction = DRIVE_DIR_SHARP_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 30},
+            {.direction = DRIVE_DIR_MID_RIGHT, .speed = DRIVE_SPEED_MAX, .duration = 40},
+            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 10},
         },
         .move_count = 4,
     },
     [RETREAT_STATE_ALIGN_RIGHT] = {
         .moves = {
-            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 20},
-            {.direction = DRIVE_DIR_SHARP_RIGHT, .speed = DRIVE_SPEED_MAX, .duration = 80},
-            {.direction = DRIVE_DIR_MID_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 140},
-            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 80},
+            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 10},
+            {.direction = DRIVE_DIR_SHARP_RIGHT, .speed = DRIVE_SPEED_MAX, .duration = 30},
+            {.direction = DRIVE_DIR_MID_LEFT, .speed = DRIVE_SPEED_MAX, .duration = 40},
+            {.direction = DRIVE_DIR_FORWARD, .speed = DRIVE_SPEED_MAX, .duration = 10},
         },
         .move_count = 4,
     },
@@ -322,7 +323,7 @@ static Move current_retreat_move(const struct Retreat_State *retreat_state){
 
 static void start_retreat_move(const struct Retreat_State *retreat_state){
     if(retreat_state->move_index > avoid_states[retreat_state->internal_retreat_state].move_count){
-        while(1) Serial.println("avd idx out bounds");
+        drive_stop();
     }
     struct Move move = current_retreat_move(retreat_state);
     timer_set_timeout(retreat_state->common_data->timer, move.duration);
@@ -342,7 +343,7 @@ void retreat_state_enter(Retreat_State *retreat_state, State from_state, Event e
                     retreat_state_run(retreat_state);
                     break;
                 default:
-                    while(1) Serial.println("10");
+                    drive_stop();
                     break;
             }
             break;
@@ -360,7 +361,7 @@ void retreat_state_enter(Retreat_State *retreat_state, State from_state, Event e
                 case EVENT_OBJ:
                     break;
                 default:
-                    while(1) Serial.println("");
+                    drive_stop();
                     break;
             }
             break;

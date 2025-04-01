@@ -102,7 +102,7 @@ static bool init_address(uint8_t sensor_idx){
   digitalWrite(pin, HIGH);
 
   i2c_set_slave_address(VL53L0X_ADDR);
-  delay(400);
+  delay(500);
 
   if ( !config_sensor_address(address) ) return false;
   return true;
