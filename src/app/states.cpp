@@ -160,15 +160,15 @@ static Internal_Avoid_State next_avoid_state(struct Avoid_State *avoid_state){
     Obj_Range obj_range = avoid_state->common_data->obj.range;
     switch(obj_range){
         case OBJ_RANGE_CLOSE:
-            return AVOID_STATE_REVERSE;
+            return AVOID_STATE_180_FLIP;
         case OBJ_RANGE_MID:
         case OBJ_RANGE_FAR:
-            return getRandomAvoidState();
+            return AVOID_STATE_180_FLIP;
         case OBJ_RANGE_NONE:
-            return AVOID_STATE_REVERSE;
+            return AVOID_STATE_180_FLIP;
     }
     drive_stop();
-    return AVOID_STATE_REVERSE;
+    return AVOID_STATE_180_FLIP;
 }
 
 bool avoid_state_done(const Avoid_State *avoid_state){

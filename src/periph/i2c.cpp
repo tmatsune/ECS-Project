@@ -205,6 +205,7 @@ static bool loc_init(uint8_t address){
 }
 
 static uint8_t stop_variable = 0;
+
 bool read_range(uint8_t address, uint16_t *range) {
   bool success = i2c_write_addr8_data8(address, 0x80, 0x01);
   success &= i2c_write_addr8_data8(address, 0xFF, 0x01);
@@ -218,18 +219,13 @@ bool read_range(uint8_t address, uint16_t *range) {
   }
 
   if (!i2c_write_addr8_data8(address, REG_SYSRANGE_START, 0x01)) return false;
-
   uint8_t sysrange_start = 0;
-  do {
-      success = i2c_read_addr8_data8(address, REG_SYSRANGE_START, &sysrange_start);
-  } while (success && (sysrange_start & 0x01)); // checks busy flag indicating operation is in progress
+  success = i2c_read_addr8_data8(address, REG_SYSRANGE_START, &sysrange_start);
   if (!success) return false;
 
   uint8_t interrupt_status = 0;
-  do {
-      success = i2c_read_addr8_data8(address, REG_RESULT_INTERRUPT_STATUS, &interrupt_status);
-  } while (success && ((interrupt_status & 0x07) == 0));
-  if (!success) return false; 
+
+    success = i2c_read_addr8_data8(address, REG_RESULT_INTERRUPT_STATUS, &interrupt_status);
 
   if (!i2c_read_addr8_data16(address, REG_RESULT_RANGE_STATUS + 10, range)) return false;
 
@@ -363,3 +359,39 @@ bool load_default_settings(uint8_t address){
   success &= i2c_write_addr8_data8(address, 0x80, 0x00);
   return success;
 }
+
+/*
+
+bool read_range(uint8_t address, uint16_t *range) {
+  bool success = i2c_write_addr8_data8(address, 0x80, 0x01);
+  success &= i2c_write_addr8_data8(address, 0xFF, 0x01);
+  success &= i2c_write_addr8_data8(address, 0x00, 0x00);
+  success &= i2c_write_addr8_data8(address, 0x91, stop_variable);
+  success &= i2c_write_addr8_data8(address, 0x00, 0x01);
+  success &= i2c_write_addr8_data8(address, 0xFF, 0x00);
+  success &= i2c_write_addr8_data8(address, 0x80, 0x00);
+  if (!success) {
+    return false;
+  }
+
+  if (!i2c_write_addr8_data8(address, REG_SYSRANGE_START, 0x01)) return false;
+
+  uint8_t sysrange_start = 0;
+  do {
+      success = i2c_read_addr8_data8(address, REG_SYSRANGE_START, &sysrange_start);
+  } while (success && (sysrange_start & 0x01)); // checks busy flag indicating operation is in progress
+  if (!success) return false;
+
+  uint8_t interrupt_status = 0;
+  do {
+      success = i2c_read_addr8_data8(address, REG_RESULT_INTERRUPT_STATUS, &interrupt_status);
+  } while (success && ((interrupt_status & 0x07) == 0));
+  if (!success) return false;
+
+  if (!i2c_read_addr8_data16(address, REG_RESULT_RANGE_STATUS + 10, range)) return false;
+
+  if (!i2c_write_addr8_data8(address, REG_SYSTEM_INTERRUPT_CLEAR, 0x01)) return false;
+
+  return true;
+}
+*/

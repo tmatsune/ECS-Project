@@ -7,8 +7,7 @@
 #include <app/obj.h>
 #include <app/line.h>
 #include <app/state_machine.h>
-#define TRIG_PIN 13
-#define ECHO_PIN 12
+#define SYSTEM_PIN 2
 
 uint16_t range = 0;
 struct Timer timer = {.time = 0, .timeout = 0};
@@ -18,13 +17,12 @@ bool run_system = false;
 // ------------------- //
 void init_app(){
     init_timer();
-    //i2c_init();
+    i2c_init();
     pwm_init();
     lines_init();
     state_machine_init(&state_machine, &timer);
-    pinMode(2, INPUT);
+    pinMode(SYSTEM_PIN, INPUT);
 }
-
 
 void setup() {
   mc_init();
@@ -36,13 +34,22 @@ void loop() {
     uint32_t time1 = get_time();
     timer_tick(&timer, time1);
 
-    range = 900;
+
+    //range = 900; // allow 
+
+    //
+    bool can_read_1 = read_range(LOC1_ADDR, &range);
+    Serial.println(range);
+    //
+
     run_system = digitalRead(2);
     if(run_system == HIGH){
         state_machine_run(&state_machine, range);
     }else{
         drive_stop();
     }
+
+
 
 }
 
